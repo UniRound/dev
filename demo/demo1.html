@@ -37,6 +37,8 @@
             } catch (error) {
                 isError.status = false;
                 isError.message = error;
+
+                app.innerHTML = `<p>Error Caught While Fetching<br><br>Error Message : ${isError.message}</p>`;
             }
         }
 

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo 1</title>
+</head>
+
+<body>
+    <!-- app container -->
+    <div id="app"></div>
+    <!-- app script -->
+    <script>
+        const USERNAME = "google";
+        const APIURL = `https://api.github.com/users/${USERNAME}/repos`;
+
+        const app = document.getElementById("app");
+
+        let isError = {
+            message: null,
+            status: false
+        }
+
+        let repos;
+
+        async function getGithubReposFrom(url) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw Error(`Response Error with StatusCode : ${response.statusCode}`);
+                }
+
+                repos = await response.json();
+
+            } catch (error) {
+                isError.status = false;
+                isError.message = error;
+            }
+        }
+
+        getGithubReposFrom(APIURL).then(function () {
+            app.innerHTML = Array.isArray(repos) ? repos.map((each, index) => {
+                return `
+                        <article class='repo-container repo-index-${index}'>
+                            <h3>${each.name}</h3>
+                            <p>${!each.description ? 'description not posted' : each.description}</p>
+                            <div>
+                                <a href='${each.html_url}'>Go to Repository</a>
+                            </div>
+                        </article>
+                        `
+            }) : `<p>Data is retrieved but is not in Array type, possibly key-value object type.</p>`;
+        })
+    </script>
+</body>
+
+</html>

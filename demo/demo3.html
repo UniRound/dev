@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- tailwind css CDN link -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Demo 3</title>
+</head>
+
+<body>
+    <!-- h1 without tailwind  -->
+    <h1>Hello World!</h1>
+    <style>
+        h1 {
+            font-size: 1rem;
+            font-weight: bold;
+
+            background-color: red;
+            color: dodgerblue;
+
+            margin-bottom: 1rem;
+            padding: 1rem;
+        }
+    </style>
+
+    <!-- h1 with tailwind  -->
+    <h1 class="text-base font-bold bg-red-400 text-[dodgerblue] mb-2 p-2">Hello World!</h1>
+</body>
+
+</html>

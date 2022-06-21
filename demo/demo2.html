@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo 2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            padding: 1rem;
+            font-family: sans-serif;
+        }
+
+        #user-input form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid #222;
+        }
+
+        #user-input form article {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        #user-input form article label {
+            font-weight: bold;
+        }
+
+        #user-input form article input {
+            width: 100%;
+            padding: 0.5rem 0.5rem;
+            font-size: 100%;
+            border: 1px solid #555;
+        }
+
+        #user-input form article button {
+            width: 100%;
+            padding: 0.5rem 0.5rem;
+            font-size: 100%;
+            border: none;
+            background-color: #111;
+            color: whitesmoke;
+        }
+
+        #repos {
+            margin-top: 2.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- app container -->
+    <div id="app">
+        <div id="user-input">
+            <form>
+                <article>
+                    <label for="username">Username</label>
+                    <input name="username" id="username" type="text" />
+                </article>
+                <article><button type="submit">Get Repositories</button></article>
+            </form>
+        </div>
+        <div id="repos">
+
+        </div>
+    </div>
+    <!-- app script -->
+    <script>
+        /**
+         * Global vars for fetching relevant
+         */
+        let isError = {
+            message: null,
+            status: false
+        }
+        let repos = [];
+        const getGithubAPIUrl = (username = "") => {
+            return username.trim() ? `https://api.github.com/users/${username.trim()}/repos` : null;
+        }
+        const getGithubReposFrom = async (githubAPIUrl) => {
+            const response = await fetch(githubAPIUrl);
+            if (!response.ok) {
+                throw Error(`Response Error : ${response.status} : User Not Found.`);
+            }
+
+            repos = await response.json();
+        }
+
+        /**
+         * DOM relevant vars
+         */
+        const repoContainer = document.getElementById("repos");
+        const form = document.querySelector("form");
+
+        /**
+         * form submit handler action
+         */
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const { target: { elements: { username } } } = e;
+            let apiKey = getGithubAPIUrl(username.value);
+            if (!apiKey) {
+                isError.message = 'API Key has detected an empty (or possibly invalid) username inputted from the user.';
+                isError.status = false;
+                repoContainer.innerHTML = `<p>PreFetch Error: ${isError.message}</p> `
+                username.value = "";
+                return;
+            }
+            getGithubReposFrom(apiKey).then(() => {
+                repoContainer.innerHTML = Array.isArray(repos) ? repos.map((each, index) => {
+                    return `
+                    <article style='margin-bottom: 10px;' class='repo-container repo-length'>
+                        <p>${repos.length} public repositories for <strong>${username.value.trim()}</strong></p>
+                        </article>
+                    <article class='repo-container repo-index-${index}'>
+                            <h3>${each.name}</h3>
+                            <p>${!each.description ? 'description not posted' : each.description}</p>
+                            <div>
+                                <a href='${each.html_url}'>Go to Repository</a>
+                            </div>
+                        </article >
+            `
+                }) : `<p> Data is retrieved but is not in Array type, possibly key - value object type.</p>`;
+                username.value = "";
+            }).catch(error => {
+                isError.message = error;
+                isError.status = false;
+                repoContainer.innerHTML = `<p>${isError.message}</p>`
+            })
+
+        })
+    </script>
+</body>
+
+</html>
